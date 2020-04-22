@@ -1,0 +1,54 @@
+snmptable -v 2c -c public 172.19.230.15 IF-MIB::ifXTable
+snmptable -v 2c -c public 172.19.230.15 SW-MIB::swFCPortTable
+
+https://www.dev-eth0.de/2016/12/06/grafana_snmp/
+
+[[inputs.snmp]]
+  agents = [ "192.168.1.250:161" ]
+  version = 2
+  community = "public"
+  name = "snmp"
+
+ [[inputs.snmp.field]]
+    name = "hostname"
+    oid = "RFC1213-MIB::sysName.0"
+    is_tag = true
+
+  [[inputs.snmp.table]]
+    name = "snmp"
+    inherit_tags = [ "hostname" ]
+    oid = "IF-MIB::ifXTable"
+
+    [[inputs.snmp.table.field]]
+      name = "ifName"
+      oid = "IF-MIB::ifName"
+      is_tag = true
+	  
+	  
+	  
+cat /etc/telegraf/telegraf.d/11-brocade01.conf
+[[inputs.snmp]]
+  agents = [ "172.19.230.15:161", "172.19.230.16:161", "172.19.230.17:161" ]
+  version = 2
+  community = "public"
+  name = "snmp_brocade10"
+  interval = "120s"
+  timeout = "20s"
+  retries = 3
+
+ [[inputs.snmp.field]]
+    name = "hostname"
+    oid = "RFC1213-MIB::sysName.0"
+    is_tag = true
+
+  [[inputs.snmp.table]]
+    name = "snmp_brocade10"
+    inherit_tags = [ "hostname" ]
+    oid = "SW-MIB::swFCPortTable"
+    #fielddrop = ["swFCPortWwn"]
+
+    [[inputs.snmp.table.field]]
+      name = "swFCPortName"
+      oid = "SW-MIB::swFCPortName"
+      is_tag = true
+
